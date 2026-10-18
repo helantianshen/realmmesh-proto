@@ -1,6 +1,14 @@
 # RealmMesh 协议与项目文档
 
-`realmmesh-proto` 是 RealmMesh RPC 协议的唯一源仓库。目前包含需求和开发规划，尚未创建 `.proto` 或生成配置。Mod 仓库已完成 MultiLoader 最小工程与 NeoForge 1.21.1 启动验证，RPC 尚未接入。
+`realmmesh-proto` 是 RealmMesh RPC 协议的唯一源仓库。目前包含需求、开发规划和最小 Echo 协议。Mod 仓库已完成 MultiLoader 最小工程与 NeoForge 1.21.1 启动验证，RPC 尚未接入。
+
+## 最小通信协议
+
+`probe/v1/probe.proto` 定义 Unary RPC `realmmesh.probe.v1.ProbeService/Echo`，请求和响应各包含编号为 1 的字符串字段 `message`，约定原样返回，包括空字符串。该接口仅用于通信验证，不处理账户、认证或资产业务。
+
+Go 生成包为 `github.com/helantianshen/realmmesh-server/gen/probe/v1`，包名为 `probev1`。生成代码保存在消费者仓库并纳入 Git，不放入本仓库。Go 生成工具固定为 `protoc 36.1`、`protoc-gen-go v1.36.11` 和 `protoc-gen-go-grpc v1.6.2`；生成命令由服务仓库维护，输出采用 `paths=source_relative`。
+
+协议编译与生成代码构建不代表运行时互通；Go handler、客户端调用及 Minecraft 内的 Java 调用仍需分别验证。
 
 | 文档 | 用途 | 状态 |
 | --- | --- | --- |

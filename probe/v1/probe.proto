@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package realmmesh.probe.v1;
+
+option go_package = "github.com/helantianshen/realmmesh-server/gen/probe/v1;probev1";
+
+// ProbeService 提供通信验证接口，不处理业务数据
+service ProbeService {
+  // Echo 原样返回请求中的消息
+  rpc Echo(EchoRequest) returns (EchoResponse);
+}
+
+message EchoRequest {
+  string message = 1;
+}
+
+message EchoResponse {
+  string message = 1;
+}

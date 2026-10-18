@@ -113,8 +113,10 @@
 
 - 已完成：四个远程仓库的本地克隆与 origin 核对；需求文档、确定的组织方案和本计划的本地整理。
 - 已完成 Mod 最小工程：MultiLoader common / neoforge、NeoForge 1.21.1 构建、客户端主菜单、开发服务端和独立成品服务端启动验证。详见 Mod 仓库 `.agent/tasks/multiloader-bootstrap.md`。
-- 尚未开始：中心服务框架、业务代码、RPC、`.proto`、Submodule、数据库与界面原型。
+- 已完成中心最小工程：Kratos HTTP 服务、手写健康接口及启动配置加载；Go 构建通过，用户已验证健康接口和正常、异常配置行为。尚无自动化测试用例。
+- 已完成最小协议：`probe/v1/probe.proto` 定义 Echo Unary RPC，固定版本工具的协议编译、Go 代码生成及生成包构建通过；验证输出位于临时目录，不属于消费者仓库的正式生成产物。
+- 尚未开始：业务代码、RPC handler 与运行时调用、Submodule、数据库与界面原型。
 - 已确认的 Mod 工程方向：MultiLoader；先开发和测试 NeoForge 1.21.1，Fabric / Forge 仅预留，后续再实施。
 - 已整理认证方向：见 `AUTHENTICATION.md`；仅文档，尚未实现。
-- 下一步：审查认证文档的待定细节，并讨论阶段 1 剩余的最小 RPC 通信方案；Mod 基础启动通过不代表 RPC 阶段已经完成。
+- 下一步：固定协议提交并接入 Submodule，在服务仓库固化生成命令和生成代码，实现 Echo handler 与 Go 客户端验证，然后接入 Mod；认证文档中的待定细节在认证实现前确认。协议构建通过不代表 RPC 阶段已经完成。
 - 验证边界：已完成 Mod 基础构建与运行检查；尚未验证玩家加入游戏、RPC 通信、数据库、资产安全或业务界面。
