@@ -1,8 +1,10 @@
 # RealmMesh 协议与项目文档
 
-`realmmesh-proto` 是 RealmMesh RPC 协议的唯一源仓库。目前包含需求、开发规划和最小 Echo 协议。Mod 仓库已完成 MultiLoader 最小工程与 NeoForge 1.21.1 启动验证，RPC 尚未接入。
+`realmmesh-proto` 是 RealmMesh RPC 协议的唯一源仓库。目前包含需求、开发规划和最小 Echo 协议。第一阶段的 Go/NeoForge Echo 通信交付已于 2026-10-19 按用户确认关闭；详细状态见开发计划。
 
 ## 最小通信协议
+
+玩家认证协议草案见 [auth/v1/auth.proto](auth/v1/auth.proto)，字段语义、结果组合和错误边界见 [玩家认证 RPC v1](auth/v1/README.md)。当前待审查，尚未接入中心或 Mod，消费者协议引用未更新。
 
 `probe/v1/probe.proto` 定义 Unary RPC `realmmesh.probe.v1.ProbeService/Echo`，请求和响应各包含编号为 1 的字符串字段 `message`，约定原样返回，包括空字符串。该接口仅用于通信验证，不处理账户、认证或资产业务。
 
@@ -15,6 +17,6 @@ Go 生成包为 `github.com/helantianshen/realmmesh-server/gen/probe/v1`，包�
 | [需求文档](REQUIREMENTS.md) | 系统目标、角色、通信、资产与信任边界、待定事项 | 需求草案；不代表全部技术与业务细节已冻结 |
 | [仓库组织与版本管理](REPOSITORIES.md) | 四仓库职责、协议共享与手动版本流程 | 用户已确认的组织方案 |
 | [认证流程与协议职责](AUTHENTICATION.md) | 统一玩家 ID、中心认证与休息规则、服务器管理、审计和 RPC 边界 | 已确认方向；实现细节与验收待完成 |
-| [分阶段开发计划](DEVELOPMENT_PLAN.md) | 阶段范围、依赖、验收与审查事项 | 整体待审查；Mod 最小工程已单独获准并完成基础验证 |
+| [分阶段开发计划](DEVELOPMENT_PLAN.md) | 阶段范围、依赖、验收与审查事项 | 第一阶段已关闭；后续阶段待确认实施 |
 
 文档整理日期：2026-10-18。文档中的未来步骤不代表执行授权；具体协议、模型、目录及框架在对应阶段确认后再创建。
