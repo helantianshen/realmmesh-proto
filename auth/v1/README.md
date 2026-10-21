@@ -1,5 +1,7 @@
 # 玩家认证 RPC v1
 
+自助改密的请求、共享失败次数、响应与踢出约束见 [玩家自助改密 RPC v1](CHANGE_PASSWORD.md)。该扩展单独审查，不改变下述注册登录字段。
+
 本契约为待审查定义，尚未接入中心 Handler 或 Mod。协议源为 [auth.proto](auth.proto)，包名 `realmmesh.auth.v1`，Go 包为 `gen/auth/v1`（`authv1`）。Java 沿用协议命名空间及默认生成规则。
 
 ## 接口与身份

@@ -1,4 +1,4 @@
-// 玩家账户认证：可信游戏服提交注册登录请求，并订阅账户变更通知
+// 玩家账户认证：可信游戏服提交注册、登录和自助改密请求，并订阅账户变更通知
 // 服务器凭据通过 gRPC metadata 携带，不在消息中重复传递或返回玩家令牌
 
 syntax = "proto3";
@@ -19,6 +19,10 @@ service AuthService {
   // Login 验证密码并提交失败计数或休息状态，再返回本次认证结果
   // 密码错误、未注册与休息期属于正常业务结果，不作为 gRPC 错误返回
   rpc Login(LoginRequest) returns (LoginResponse);
+
+  // ChangePassword 验证旧密码后修改密码，与登录共用失败次数和休息期
+  // 仅允许已登录连接发起；提交成功后广播变更，发起连接也须清除认证并退出
+  rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse);
 
   // SubscribeAccountEvents 订阅中心提交成功后的账户变更，仅推送在线通知
   // 建流及每次发送均校验服务器凭据，断线期间的事件不保存、不补发
@@ -108,4 +112,46 @@ message LoginResponse {
 
   // 仅 COOLING_DOWN 时为 true，游戏服每次收到均应踢出发起请求的本次连接
   bool kick = 7;
+}
+
+// ChangePasswordRequest 为当前已登录连接自助改密，不支持指定其他账户或管理员重置
+// 游戏服先确认两次新密码一致，中心独立验证新密码格式及旧密码
+message ChangePasswordRequest {
+  // 当前真实连接的玩家名字，规则与登录一致，不接受客户端指定其他主体
+  string player_name = 1;
+
+  // 原始旧密码；非休息账户提交格式错误的旧密码也计为失败
+  string old_password = 2;
+
+  // 原始新密码，规则与注册一致；格式错误不计失败次数，不保存到游戏服
+  string new_password = 3;
+}
+
+// ChangePasswordStatus 区分改密业务结果，零值和未知值均不能视作成功
+enum ChangePasswordStatus {
+  CHANGE_PASSWORD_STATUS_UNSPECIFIED = 0; // 未指定结果，中心不得作为正常业务结果发送
+  CHANGE_PASSWORD_STATUS_SUCCEEDED = 1; // 新密码及失败次数清零已提交，需要退出后重新登录
+  CHANGE_PASSWORD_STATUS_UNREGISTERED = 2; // 账户不存在或已删除，不计数，清除本地认证并退出
+  CHANGE_PASSWORD_STATUS_WRONG_PASSWORD = 3; // 旧密码错误但未达到共享阈值，仍可尝试
+  CHANGE_PASSWORD_STATUS_COOLING_DOWN = 4; // 已进入或仍处于共享休息期，本次连接需要被踢出
+}
+
+// ChangePasswordResponse 在密码变更或失败状态提交成功后返回，不授予登录状态
+// 成功响应与账户变更通知可能先后到达，两者均要求清除认证并退出
+message ChangePasswordResponse {
+  ChangePasswordStatus status = 1; // 本次改密的业务结果
+
+  // WRONG_PASSWORD 时为触发休息前剩余次数，SUCCEEDED 时为清零后的失败阈值
+  // 其余状态为 0，与登录读取和修改同一份持久化失败状态
+  int64 remaining_attempts = 2;
+
+  // 仅 COOLING_DOWN 时设置，沿用中心绝对截止时刻，再次请求不延长
+  google.protobuf.Timestamp cooldown_until = 3;
+
+  // 仅 COOLING_DOWN 时为正数，中心向上取整的剩余秒数，仅供提示
+  int64 retry_after_seconds = 4;
+
+  // SUCCEEDED、UNREGISTERED 和 COOLING_DOWN 时为 true，每次收到均处理本次连接
+  // WRONG_PASSWORD 时为 false；踢出文案由 status 决定
+  bool kick = 5;
 }
