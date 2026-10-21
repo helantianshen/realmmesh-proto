@@ -1,0 +1,40 @@
+// 玩家连接审计：可信游戏服上报进服与离服事实，不表示账户认证成功
+// 服务器身份只从 gRPC metadata 的凭据认证结果取得
+syntax = "proto3";
+
+package realmmesh.audit.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/helantianshen/realmmesh-server/gen/audit/v1;auditv1";
+
+// AuditService 接收尽力上报的连接记录，不维护中心在线会话
+service AuditService {
+  // ReportPlayerConnectionEvent 每次写入一条记录，成功返回空响应
+  // 非法参数返回 InvalidArgument，凭据无效返回 Unauthenticated，存储失败返回 Internal
+  // 失败或超时不阻断游戏流程，不自动重试；超时不保证记录未写入
+  rpc ReportPlayerConnectionEvent(ReportPlayerConnectionEventRequest) returns (ReportPlayerConnectionEventResponse);
+}
+
+// PlayerConnectionEventType 只描述游戏连接生命周期，零值及未知值非法
+enum PlayerConnectionEventType {
+  PLAYER_CONNECTION_EVENT_TYPE_UNSPECIFIED = 0;
+  PLAYER_CONNECTION_EVENT_TYPE_JOINED = 1;
+  PLAYER_CONNECTION_EVENT_TYPE_LEFT = 2;
+}
+
+// ReportPlayerConnectionEventRequest 不包含密码、命令、IP、坐标或账户登录状态
+message ReportPlayerConnectionEventRequest {
+  PlayerConnectionEventType event_type = 1;
+  // 服务端实际玩家名字，符合 Java 正版名字规则，保留大小写
+  string player_name = 2;
+  // 每次进服生成的非零 UUID 标准字符串；同一次进服和离服共用，重进必须更换
+  // 仅用于关联，不是身份凭据、幂等键或中心会话 ID
+  string connection_id = 3;
+  // 必填且为有效 Timestamp，表示游戏服观察时间；中心另记接收时间
+  // 不根据游戏服时钟判断事件先后，不保证离服记录晚于进服记录到达
+  google.protobuf.Timestamp occurred_at = 4;
+}
+
+// ReportPlayerConnectionEventResponse 表示本次记录写入成功，不返回或更新玩家认证状态
+message ReportPlayerConnectionEventResponse {}
