@@ -4,6 +4,8 @@
 
 ## 最小通信协议
 
+账户变更通知草案见 [账户变更通知 RPC v1](auth/v1/ACCOUNT_EVENTS.md)，使用认证服务的服务端流广播改密和账户删除事件。本次新增协议待审查，尚未接入消费者。
+
 游戏服配置拉取协议草案见 [config/v1/config.proto](config/v1/config.proto)，字段、错误及启动和轮询约定见 [游戏服配置拉取 RPC v1](config/v1/README.md)。本协议待审查，尚未接入中心或 Mod。
 
 玩家认证协议草案见 [auth/v1/auth.proto](auth/v1/auth.proto)，字段语义、结果组合和错误边界见 [玩家认证 RPC v1](auth/v1/README.md)。当前待审查，尚未接入中心或 Mod，消费者协议引用未更新。
