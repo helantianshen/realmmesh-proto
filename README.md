@@ -4,6 +4,8 @@
 
 ## 最小通信协议
 
+游戏服配置拉取协议草案见 [config/v1/config.proto](config/v1/config.proto)，字段、错误及启动和轮询约定见 [游戏服配置拉取 RPC v1](config/v1/README.md)。本协议待审查，尚未接入中心或 Mod。
+
 玩家认证协议草案见 [auth/v1/auth.proto](auth/v1/auth.proto)，字段语义、结果组合和错误边界见 [玩家认证 RPC v1](auth/v1/README.md)。当前待审查，尚未接入中心或 Mod，消费者协议引用未更新。
 
 `probe/v1/probe.proto` 定义 Unary RPC `realmmesh.probe.v1.ProbeService/Echo`，请求和响应各包含编号为 1 的字符串字段 `message`，约定原样返回，包括空字符串。该接口仅用于通信验证，不处理账户、认证或资产业务。

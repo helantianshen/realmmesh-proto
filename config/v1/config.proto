@@ -1,0 +1,27 @@
+// 游戏服运行配置：中心向可信游戏服提供全服共用的配置值
+// 服务器凭据通过 gRPC metadata 携带，请求不重复声明服务器身份
+
+syntax = "proto3";
+
+package realmmesh.config.v1;
+
+option go_package = "github.com/helantianshen/realmmesh-server/gen/config/v1;configv1";
+
+// ConfigService 提供中心统一管理的游戏服配置，不返回凭据或中心连接配置
+// 每次调用均要求有效服务器凭据，并读取中心数据库中的当前配置
+service ConfigService {
+  // GetConfig 返回当前配置，供游戏服启动检查及运行期间定期拉取
+  // 配置缺失、非法或读取失败时返回 gRPC 错误，不以默认值代替
+  rpc GetConfig(GetConfigRequest) returns (GetConfigResponse);
+}
+
+// GetConfigRequest 无需筛选参数，所有通过认证的游戏服读取同一套配置
+message GetConfigRequest {}
+
+// GetConfigResponse 只携带游戏服需要执行的配置，不包含版本或差量信息
+message GetConfigResponse {
+  // 玩家登录时限，单位为秒，必须为正整数；中心初始化默认值为 60
+  // 玩家进入时固定本次期限，配置刷新只影响之后进入的玩家
+  // 零值及负数均为非法响应，不表示关闭超时或使用本地默认值
+  int32 login_timeout_seconds = 1;
+}
